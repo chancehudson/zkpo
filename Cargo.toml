@@ -1,0 +1,15 @@
+[package]
+name = "zkpo"
+version = "0.1.0"
+edition = "2024"
+description = "Zero knowledge program operations"
+license = "MIT OR Apache-2.0"
+
+[features]
+default = ["risczero"]
+risczero = ["risc0-zkvm", "bincode"]
+
+[dependencies]
+anyhow = "1.0.98"
+bincode = { version = "1", optional = true }
+risc0-zkvm = { version = "2.3.1", optional = true }
