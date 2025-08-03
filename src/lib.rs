@@ -1,7 +1,7 @@
 /// An interface for programs and arguments of execution.
 use anyhow::Result;
 
-mod risczero;
+pub mod risczero;
 
 /// A program to be argued to have been executed.
 pub trait ZKProgram {
@@ -34,8 +34,8 @@ pub trait ZKExe {
 }
 
 /// A structure that can
-/// - create proofs provided a ZKProgram
-/// - verify proofs provided a ZKProof
+/// - execute, provided a ZKProgram
+/// - verify, execution provided a ZKExe
 ///
 /// Each agent can verify many different programs using
 /// many different proving systems.
