@@ -6,6 +6,9 @@ mod risczero;
 /// A program to be argued to have been executed.
 pub trait ZKProgram {
     /// Unique (per agent) identifier for the program.
+    ///
+    /// Although this is available, prefer statically
+    /// analyzable program identification.
     fn id(&self) -> &[u8; 32];
     /// Optional human readable name.
     fn name(&self) -> Option<&str>;
@@ -37,8 +40,8 @@ pub trait ZKExe {
 /// Each agent can verify many different programs using
 /// many different proving systems.
 pub trait ZKAgent {
-    /// Generate a proof. Inputs are expected to be serialized outside
-    /// of this implementation.
+    /// Generate an argument of execution. Inputs are expected
+    /// to be serialized arbitrarily outside of this implementation.
     fn execute(&self, input: &[u8], program: &dyn ZKProgram) -> Result<Box<dyn ZKExe>>;
     /// Verify an argument of execution and return the public output data.
     fn verify(&self, proof: &dyn ZKExe) -> Result<Vec<u8>>;
