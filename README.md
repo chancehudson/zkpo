@@ -1,4 +1,4 @@
 # zkpo
 
-Zero knowledge proof operations.
+Zero knowledge program operations.
 
