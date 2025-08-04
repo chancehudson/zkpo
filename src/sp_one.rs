@@ -1,3 +1,5 @@
+use std::sync::OnceLock;
+
 use anyhow::Result;
 use sp1_sdk::HashableKey;
 use sp1_sdk::ProverClient;
@@ -24,7 +26,8 @@ impl ZKExe for ZKSPOneExe {
     }
 
     fn agent(&self) -> Option<&dyn ZKAgent> {
-        None
+        static DEFAULT: OnceLock<ZKSPOneAgent> = OnceLock::new();
+        Some(DEFAULT.get_or_init(|| ZKSPOneAgent::default()))
     }
 
     fn program(&self) -> Option<&dyn ZKProgram> {
@@ -33,7 +36,7 @@ impl ZKExe for ZKSPOneExe {
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ZKSPOneAgent;
 
 impl ZKAgent for ZKSPOneAgent {

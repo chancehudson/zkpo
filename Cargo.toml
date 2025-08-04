@@ -1,12 +1,12 @@
 [package]
 name = "zkpo"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2024"
 description = "Zero knowledge program operations"
 license = "MIT OR Apache-2.0"
 
 [features]
-default = ["sp_one"]
+default = []
 risc_zero = ["risc0-zkvm", "bincode"]
 sp_one = ["sp1-sdk", "bincode"]
 
