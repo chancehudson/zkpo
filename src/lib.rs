@@ -1,9 +1,27 @@
-/// An interface for programs and arguments of execution.
+/// An interface for zk programs and arguments of execution.
+///
+/// With zk you compile (arithmetize) a program to a system
+/// of equations. Then you prove/argue knowledge of a solution
+/// to the system of equations, which implies execution.
 use anyhow::Result;
 
 pub mod risczero;
 
-/// A program to be argued to have been executed.
+/// A structure that can
+/// - execute, provided a ZKProgram
+/// - verify execution, provided a ZKExe
+///
+/// Agents may verify many different programs using
+/// many different proving systems.
+pub trait ZKAgent {
+    /// Generate an argument of execution. Inputs are expected
+    /// to be serialized arbitrarily outside of this implementation.
+    fn execute(&self, input: &[u8], program: &dyn ZKProgram) -> Result<Box<dyn ZKExe>>;
+    /// Verify an argument of execution and return the public output data.
+    fn verify(&self, proof: &dyn ZKExe) -> Result<Vec<u8>>;
+}
+
+/// A program that can be executed in zk by an agent.
 pub trait ZKProgram {
     /// Unique (per agent) identifier for the program.
     ///
@@ -31,18 +49,4 @@ pub trait ZKExe {
     /// Optional reference to program. For statically safe
     /// programs over the wire.
     fn program(&self) -> Option<&dyn ZKProgram>;
-}
-
-/// A structure that can
-/// - execute, provided a ZKProgram
-/// - verify, execution provided a ZKExe
-///
-/// Each agent can verify many different programs using
-/// many different proving systems.
-pub trait ZKAgent {
-    /// Generate an argument of execution. Inputs are expected
-    /// to be serialized arbitrarily outside of this implementation.
-    fn execute(&self, input: &[u8], program: &dyn ZKProgram) -> Result<Box<dyn ZKExe>>;
-    /// Verify an argument of execution and return the public output data.
-    fn verify(&self, proof: &dyn ZKExe) -> Result<Vec<u8>>;
 }
