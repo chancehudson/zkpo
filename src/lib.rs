@@ -5,6 +5,7 @@
 /// to the system of equations, which implies execution.
 use anyhow::Result;
 
+#[cfg(feature = "risczero")]
 pub mod risczero;
 
 /// A structure that can
