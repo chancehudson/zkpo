@@ -6,10 +6,10 @@
 use anyhow::Result;
 
 pub mod prelude;
-#[cfg(feature = "risc_zero")]
-pub mod risc_zero;
-#[cfg(feature = "sp_one")]
-pub mod sp_one;
+#[cfg(feature = "risc0")]
+pub mod risc0;
+#[cfg(feature = "sp1")]
+pub mod sp1;
 
 /// A structure that can
 /// - execute, provided a ZKProgram

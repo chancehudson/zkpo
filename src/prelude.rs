@@ -2,8 +2,8 @@ pub use crate::ZKAgent;
 pub use crate::ZKExe;
 pub use crate::ZKProgram;
 
-#[cfg(feature = "risc_zero")]
-pub use crate::risc_zero::*;
+#[cfg(feature = "risc0")]
+pub use crate::risc0::*;
 
-#[cfg(feature = "sp_one")]
-pub use crate::sp_one::*;
+#[cfg(feature = "sp1")]
+pub use crate::sp1::*;
