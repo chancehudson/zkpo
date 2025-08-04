@@ -5,8 +5,11 @@
 /// to the system of equations, which implies execution.
 use anyhow::Result;
 
-#[cfg(feature = "risczero")]
-pub mod risczero;
+pub mod prelude;
+#[cfg(feature = "risc_zero")]
+pub mod risc_zero;
+#[cfg(feature = "sp_one")]
+pub mod sp_one;
 
 /// A structure that can
 /// - execute, provided a ZKProgram
@@ -19,6 +22,9 @@ pub trait ZKAgent {
     /// to be serialized arbitrarily outside of this implementation.
     fn execute(&self, input: &[u8], program: &dyn ZKProgram) -> Result<Box<dyn ZKExe>>;
     /// Verify an argument of execution and return the public output data.
+    ///
+    /// Each implementation MUST verify the `program_id` as a part
+    /// of the cryptographic argument of knowledge.
     fn verify(&self, proof: &dyn ZKExe) -> Result<Vec<u8>>;
 }
 

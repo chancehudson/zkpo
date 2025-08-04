@@ -4,10 +4,9 @@ use anyhow::Result;
 use risc0_zkvm::Digest;
 use risc0_zkvm::{ExecutorEnv, Receipt, default_prover};
 
-use crate::ZKAgent;
-use crate::ZKExe;
-use crate::ZKProgram;
+use crate::prelude::*;
 
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug)]
 pub struct ZKRiscZeroArg {
     pub receipt_bytes: Vec<u8>,
@@ -33,8 +32,7 @@ impl ZKExe for ZKRiscZeroArg {
     }
 }
 
-/// TODO: serialize as well, so provers can be embedded in network data
-/// for declarative zk proofs. related: typetag
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Default, Debug)]
 pub struct ZKRiscZeroAgent;
 
