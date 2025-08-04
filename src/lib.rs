@@ -56,4 +56,12 @@ pub trait ZKExe {
     /// Optional reference to program. For statically safe
     /// programs over the wire.
     fn program(&self) -> Option<&dyn ZKProgram>;
+
+    /// Attempt to determine a program name, or return a placeholder.
+    fn program_name(&self) -> &str {
+        self.program()
+            .map(|p| p.name())
+            .flatten()
+            .unwrap_or("unnamed program")
+    }
 }
