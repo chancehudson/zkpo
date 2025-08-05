@@ -49,15 +49,18 @@ impl ZKSPOneAgent {
 impl ZKAgent for ZKSPOneAgent {
     fn execute(&self, input: &[u8], program: &dyn ZKProgram) -> Result<Box<dyn ZKExe>> {
         let mut stdin = SP1Stdin::new();
-        stdin.write(&input);
+
+        stdin.write_slice(&input);
         // I don't much care for taking env vars from the host program...
         let client = ProverClient::from_env();
 
         // executing without generating a proof
+        //
+        // this execute call is redundant, prove calls execute internally.
+        // TODO: remove
         let (public_values, report) = client.execute(program.elf(), &stdin).run()?;
 
         println!("sp1 report: {report}");
-        println!("sp1 public values: {public_values:?}");
 
         let (pk, vk) = client.setup(program.elf());
         assert_eq!(
