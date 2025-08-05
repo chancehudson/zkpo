@@ -1,3 +1,8 @@
+//! A `ZKAgent` implementation for the risc0@2
+//! prover implementation.
+//!
+//! By default produces recursively verified STARK proofs.
+
 use std::sync::OnceLock;
 
 use anyhow::Result;

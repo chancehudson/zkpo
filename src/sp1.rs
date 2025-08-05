@@ -1,3 +1,8 @@
+//! A `ZKAgent` implementation for the sp1@4
+//! prover implementation.
+//!
+//! By default produces recursively verified STARK proofs.
+//!
 use std::sync::OnceLock;
 
 use anyhow::Result;
@@ -11,6 +16,10 @@ use crate::prelude::*;
 
 static DEFAULT_AGENT: OnceLock<ZKSPOneAgent> = OnceLock::new();
 
+/// An argument of execution containing an SP1 compressed
+/// STARK proof. The program in question is broken into "shards"
+/// and each shard is proven and then recursively verified
+/// into the final compressed STARK proof.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug)]
 pub struct ZKSPOneExe {
@@ -36,11 +45,14 @@ impl ZKExe for ZKSPOneExe {
     }
 }
 
+/// A succinct SP1 prover agent. Produces compressed STARK arguments of
+/// knowledge.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Default, Debug)]
 pub struct ZKSPOneAgent;
 
 impl ZKSPOneAgent {
+    /// Get a reference to a global shared instance of the agent.
     pub fn singleton() -> &'static Self {
         DEFAULT_AGENT.get_or_init(|| ZKSPOneAgent::default())
     }
@@ -52,6 +64,9 @@ impl ZKAgent for ZKSPOneAgent {
 
         stdin.write_slice(&input);
         // I don't much care for taking env vars from the host program...
+        //
+        // TODO: store this client on the instance to avoid initialization cost
+        // in execution/proving?
         let client = ProverClient::from_env();
 
         // executing without generating a proof
