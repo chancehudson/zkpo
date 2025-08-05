@@ -9,6 +9,8 @@ use sp1_sdk::SP1VerifyingKey;
 
 use crate::prelude::*;
 
+static DEFAULT_AGENT: OnceLock<ZKSPOneAgent> = OnceLock::new();
+
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug)]
 pub struct ZKSPOneExe {
@@ -25,9 +27,8 @@ impl ZKExe for ZKSPOneExe {
         &self.proof
     }
 
-    fn agent(&self) -> Option<&dyn ZKAgent> {
-        static DEFAULT: OnceLock<ZKSPOneAgent> = OnceLock::new();
-        Some(DEFAULT.get_or_init(|| ZKSPOneAgent::default()))
+    fn agent(&self) -> &dyn ZKAgent {
+        ZKSPOneAgent::singleton()
     }
 
     fn program(&self) -> Option<&dyn ZKProgram> {
@@ -36,8 +37,14 @@ impl ZKExe for ZKSPOneExe {
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default, Debug)]
 pub struct ZKSPOneAgent;
+
+impl ZKSPOneAgent {
+    pub fn singleton() -> &'static Self {
+        DEFAULT_AGENT.get_or_init(|| ZKSPOneAgent::default())
+    }
+}
 
 impl ZKAgent for ZKSPOneAgent {
     fn execute(&self, input: &[u8], program: &dyn ZKProgram) -> Result<Box<dyn ZKExe>> {

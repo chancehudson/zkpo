@@ -40,9 +40,18 @@ pub trait ZKProgram {
     /// Executable linkable format data of the program.
     /// Arbitrary, defined by each agent implementation.
     fn elf(&self) -> &[u8];
-    /// Optional, statically stable, agent implementation
+    /// Statically stable agent implementation
     /// compatible with this program.
-    fn agent(&self) -> Option<&dyn ZKAgent>;
+    fn agent(&self) -> &dyn ZKAgent;
+    /// Use an agent to execute the program in zk and
+    /// generate an argument of execution.
+    fn execute(&self, input: &[u8], agent: Option<&dyn ZKAgent>) -> Result<Box<dyn ZKExe>>
+    where
+        Self: Sized,
+    {
+        let agent = agent.unwrap_or(self.agent());
+        agent.execute(input, self)
+    }
 }
 
 /// An arithmetization agnostic argument of execution.
@@ -52,7 +61,7 @@ pub trait ZKExe {
     /// 32 byte program id that Self argues was executed.
     fn program_id(&self) -> &[u8; 32];
     /// Optional structure capable of creating and verifying Self.
-    fn agent(&self) -> Option<&dyn ZKAgent>;
+    fn agent(&self) -> &dyn ZKAgent;
     /// Optional reference to program. For statically safe
     /// programs over the wire.
     fn program(&self) -> Option<&dyn ZKProgram>;

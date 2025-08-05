@@ -6,6 +6,8 @@ use risc0_zkvm::{ExecutorEnv, Receipt, default_prover};
 
 use crate::prelude::*;
 
+static DEFAULT: OnceLock<ZKRiscZeroAgent> = OnceLock::new();
+
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug)]
 pub struct ZKRiscZeroArg {
@@ -14,17 +16,16 @@ pub struct ZKRiscZeroArg {
 }
 
 impl ZKExe for ZKRiscZeroArg {
-    fn agent(&self) -> Option<&dyn ZKAgent> {
-        static DEFAULT: OnceLock<ZKRiscZeroAgent> = OnceLock::new();
-        Some(DEFAULT.get_or_init(|| ZKRiscZeroAgent::default()))
-    }
-
     fn cipher_bytes(&self) -> &[u8] {
         &self.receipt_bytes
     }
 
     fn program_id(&self) -> &[u8; 32] {
         &self.program_id
+    }
+
+    fn agent(&self) -> &dyn ZKAgent {
+        ZKRiscZeroAgent::singleton()
     }
 
     fn program(&self) -> Option<&dyn ZKProgram> {
@@ -35,6 +36,12 @@ impl ZKExe for ZKRiscZeroArg {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Default, Debug)]
 pub struct ZKRiscZeroAgent;
+
+impl ZKRiscZeroAgent {
+    pub fn singleton() -> &'static Self {
+        DEFAULT.get_or_init(|| ZKRiscZeroAgent::default())
+    }
+}
 
 impl ZKAgent for ZKRiscZeroAgent {
     fn execute(&self, input: &[u8], program: &dyn ZKProgram) -> Result<Box<dyn ZKExe>> {
