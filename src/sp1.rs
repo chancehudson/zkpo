@@ -58,7 +58,7 @@ impl ZKAgent for ZKSPOneAgent {
         //
         // this execute call is redundant, prove calls execute internally.
         // TODO: remove
-        let (public_values, report) = client.execute(program.elf(), &stdin).run()?;
+        let (_public_values, report) = client.execute(program.elf(), &stdin).run()?;
 
         println!("sp1 report: {report}");
 
