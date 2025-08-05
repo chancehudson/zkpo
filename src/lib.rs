@@ -1,8 +1,8 @@
-/// An interface for zk programs and arguments of execution.
-///
-/// With zk you compile (arithmetize) a program to a system
-/// of equations. Then you prove/argue knowledge of a solution
-/// to the system of equations, which implies execution.
+//! An interface for zk programs and arguments of execution.
+//!
+//! With zk you compile (arithmetize) a program to a system
+//! of equations. Then you prove/argue knowledge of a solution
+//! to the system of equations, which implies execution.
 use anyhow::Result;
 
 pub mod prelude;
@@ -11,9 +11,8 @@ pub mod risc0;
 #[cfg(feature = "sp1")]
 pub mod sp1;
 
-/// A structure that can
-/// - execute, provided a ZKProgram
-/// - verify execution, provided a ZKExe
+/// A structure that can execute `&dyn ZKProgram`'s
+/// and verify arguments of execution (`&dyn ZKExe`).
 ///
 /// Agents may verify many different programs using
 /// many different proving systems.
@@ -29,6 +28,8 @@ pub trait ZKAgent {
 }
 
 /// A program that can be executed in zk by an agent.
+/// The agent yields an argument of execution, which
+/// can be verified.
 pub trait ZKProgram {
     /// Unique (per agent) identifier for the program.
     ///
