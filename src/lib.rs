@@ -7,10 +7,8 @@ use anyhow::Result;
 
 pub mod prelude;
 
-#[cfg_attr(docsrs, doc(cfg(feature = "risc0")))]
 #[cfg(feature = "risc0")]
 pub mod risc0;
-#[cfg_attr(docsrs, doc(cfg(feature = "sp1")))]
 #[cfg(feature = "sp1")]
 pub mod sp1;
 
