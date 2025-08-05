@@ -7,7 +7,9 @@ use std::sync::OnceLock;
 
 use anyhow::Result;
 use risc0_zkvm::Digest;
-use risc0_zkvm::{ExecutorEnv, Receipt, default_prover};
+use risc0_zkvm::ExecutorEnv;
+use risc0_zkvm::Receipt;
+use risc0_zkvm::default_prover;
 
 use crate::prelude::*;
 
@@ -38,6 +40,8 @@ impl ZKExe for ZKRiscZeroArg {
     }
 }
 
+/// A risc0@2 zk agent. Produces compressed STARKs. `ZKProgram`s compiled
+/// from the risc0 toolchain are not yet functional.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Default, Debug)]
 pub struct ZKRiscZeroAgent;

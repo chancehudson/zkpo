@@ -5,6 +5,8 @@
 //! to the system of equations, which implies execution.
 use anyhow::Result;
 
+/// Exports all zkpo types, including concrete implementations
+/// behind features.
 pub mod prelude;
 
 #[cfg(feature = "risc0")]
