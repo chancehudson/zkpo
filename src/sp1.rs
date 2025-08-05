@@ -49,16 +49,14 @@ impl ZKAgent for ZKSPOneAgent {
         // executing without generating a proof
         let (public_values, report) = client.execute(program.elf(), &stdin).run()?;
 
-        #[cfg(debug_assertions)]
-        println!("sp1 report: {report:?}");
-        #[cfg(debug_assertions)]
+        println!("sp1 report: {report}");
         println!("sp1 public values: {public_values:?}");
 
         let (pk, vk) = client.setup(program.elf());
         assert_eq!(
             vk.hash_bytes(),
             *program.id(),
-            "prover vkey mismatched program vkey, claude said this wouldn't happen :("
+            "prover vkey mismatched program vkey"
         );
         // prove recursive stark by default
         let proof = client.prove(&pk, &stdin).compressed().run()?;
