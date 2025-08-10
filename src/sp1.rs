@@ -3,9 +3,12 @@
 //!
 //! By default produces recursively verified STARK proofs.
 //!
+use std::path::Path;
+use std::path::PathBuf;
 use std::sync::OnceLock;
 
 use anyhow::Result;
+use sp1_build::BuildArgs;
 use sp1_sdk::HashableKey;
 use sp1_sdk::ProverClient;
 use sp1_sdk::SP1ProofWithPublicValues;
@@ -15,6 +18,54 @@ use sp1_sdk::SP1VerifyingKey;
 use crate::prelude::*;
 
 static DEFAULT_AGENT: OnceLock<ZKSPOneAgent> = OnceLock::new();
+
+/// Build the specified binaries and put the output
+/// elf files somewhere.
+///
+/// This is meant to be used in a `build.rs` in a
+/// dependent project. Files will NOT be built if the
+/// `CI` env variable is set, or if the target OS is `zkvm`.
+///
+/// Arguments:
+/// * `binaries`: names of binary targets to be built
+/// * `features`: names of features to enable in the build
+/// * `no_default_features`: whether to disable default features
+/// * `output_dir`: (optional) path relative to manifest directory to store compiled binaries. By
+/// default binaries will be stored in `target/`
+///
+/// See also: https://docs.rs/sp1-build/latest/sp1_build/fn.execute_build_program.html
+pub fn build(
+    binaries: &[&str],
+    features: &[&str],
+    no_default_features: bool,
+    output_dir: Option<&Path>,
+) -> Result<()> {
+    // if we're in a CI don't rebuild the elf files
+    // use the committed ones
+    let is_ci = std::env::var("CI").is_ok();
+    let target = std::env::var("CARGO_CFG_TARGET_OS")?;
+    if target == "zkvm" || is_ci {
+        return Ok(());
+    }
+
+    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR")?;
+    let build_args = BuildArgs {
+        docker: false,
+        binaries: binaries.iter().map(|v| (*v).into()).collect(),
+        features: features.iter().map(|v| (*v).into()).collect(),
+        no_default_features,
+        output_directory: output_dir.map(|path| {
+            PathBuf::from(manifest_dir)
+                .join(path)
+                .to_string_lossy()
+                .to_string()
+        }),
+        ..Default::default()
+    };
+    sp1_build::execute_build_program(&build_args, None)?;
+
+    Ok(())
+}
 
 /// An argument of execution containing an SP1 compressed
 /// STARK proof. The program in question is broken into "shards"

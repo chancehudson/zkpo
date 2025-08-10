@@ -1,6 +1,6 @@
 [package]
 name = "zkpo"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2024"
 description = "Zero knowledge program operations"
 license = "MIT OR Apache-2.0"
@@ -12,9 +12,9 @@ all-features = true
 [features]
 default = []
 risc0 = ["risc0-zkvm", "bincode"]
-sp1 = ["sp1-sdk", "bincode"]
+sp1 = ["sp1-sdk", "sp1-build", "bincode"]
 
-serde = [ "dep:serde" ]
+serde = ["dep:serde"]
 
 [dependencies]
 anyhow = "1.0.98"
@@ -24,3 +24,4 @@ serde = { version = "1.0.219", features = ["derive"], optional = true }
 #sp1-prover = { version = "4", optional = true }
 sp1-sdk = { version = "4", optional = true }
 #sp1-zkvm = { version = "4", optional = true }
+sp1-build = { version = "4", optional = true }
