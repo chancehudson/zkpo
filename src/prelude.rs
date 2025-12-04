@@ -1,5 +1,5 @@
 pub use crate::ZKAgent;
-pub use crate::ZKExe;
+pub use crate::ZKArg;
 pub use crate::ZKProgram;
 
 #[cfg(feature = "risc0")]

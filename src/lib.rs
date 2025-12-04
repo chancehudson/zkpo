@@ -15,19 +15,19 @@ pub mod risc0;
 pub mod sp1;
 
 /// A structure that can execute `&dyn ZKProgram`'s
-/// and verify arguments of execution (`&dyn ZKExe`).
+/// and verify arguments of execution (`&dyn ZKArg`).
 ///
 /// Agents may verify many different programs using
 /// many different proving systems.
 pub trait ZKAgent {
     /// Generate an argument of execution. Inputs are expected
     /// to be serialized arbitrarily outside of this implementation.
-    fn execute(&self, input: &[u8], program: &dyn ZKProgram) -> Result<Box<dyn ZKExe>>;
+    fn execute(&self, input: &[u8], program: &dyn ZKProgram) -> Result<Box<dyn ZKArg>>;
     /// Verify an argument of execution and return the public output data.
     ///
     /// Each implementation MUST verify the `program_id` as a part
     /// of the cryptographic argument of knowledge.
-    fn verify(&self, proof: &dyn ZKExe) -> Result<Vec<u8>>;
+    fn verify(&self, proof: &dyn ZKArg) -> Result<Vec<u8>>;
 }
 
 /// A program that can be executed in zk by an agent.
@@ -49,7 +49,7 @@ pub trait ZKProgram {
     fn agent(&self) -> &dyn ZKAgent;
     /// Use an agent to execute the program in zk and
     /// generate an argument of execution.
-    fn execute(&self, input: &[u8], agent: Option<&dyn ZKAgent>) -> Result<Box<dyn ZKExe>>
+    fn execute(&self, input: &[u8], agent: Option<&dyn ZKAgent>) -> Result<Box<dyn ZKArg>>
     where
         Self: Sized,
     {
@@ -59,7 +59,7 @@ pub trait ZKProgram {
 }
 
 /// An arithmetization agnostic argument of execution.
-pub trait ZKExe {
+pub trait ZKArg {
     /// Opaque agent specific data necessary for verification.
     fn cipher_bytes(&self) -> &[u8];
     /// 32 byte program id that Self argues was executed.
