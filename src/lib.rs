@@ -4,77 +4,40 @@
 //! of equations. Then you prove/argue knowledge of a solution
 //! to the system of equations, which implies execution.
 use anyhow::Result;
+use lettuce::*;
 
 /// Exports all zkpo types, including concrete implementations
 /// behind features.
 pub mod prelude;
 
-#[cfg(feature = "risc0")]
-pub mod risc0;
-#[cfg(feature = "sp1")]
-pub mod sp1;
+// #[cfg(feature = "risc0")]
+// pub mod risc0;
+// #[cfg(feature = "sp1")]
+// pub mod sp1;
 
-/// A structure that can execute `&dyn ZKProgram`'s
-/// and verify arguments of execution (`&dyn ZKArg`).
-///
-/// Agents may verify many different programs using
-/// many different proving systems.
-pub trait ZKAgent {
-    /// Generate an argument of execution. Inputs are expected
-    /// to be serialized arbitrarily outside of this implementation.
-    fn execute(&self, input: &[u8], program: &dyn ZKProgram) -> Result<Box<dyn ZKArg>>;
-    /// Verify an argument of execution and return the public output data.
+/// This trait forms the boundary between algebra and bits
+pub trait ZKProgram<E: FieldScalar> {
     ///
-    /// Each implementation MUST verify the `program_id` as a part
-    /// of the cryptographic argument of knowledge.
-    fn verify(&self, proof: &dyn ZKArg) -> Result<Vec<u8>>;
-}
+    fn id(&self) -> Vector<E>;
 
-/// A program that can be executed in zk by an agent.
-/// The agent yields an argument of execution, which
-/// can be verified.
-pub trait ZKProgram {
-    /// Unique (per agent) identifier for the program.
-    ///
-    /// Although this is available, prefer statically
-    /// analyzable program identification.
-    fn id(&self) -> &[u8; 32];
-    /// Optional human readable name.
-    fn name(&self) -> Option<&str>;
-    /// Executable linkable format data of the program.
-    /// Arbitrary, defined by each agent implementation.
-    fn elf(&self) -> &[u8];
-    /// Statically stable agent implementation
-    /// compatible with this program.
-    fn agent(&self) -> &dyn ZKAgent;
-    /// Use an agent to execute the program in zk and
-    /// generate an argument of execution.
-    fn execute(&self, input: &[u8], agent: Option<&dyn ZKAgent>) -> Result<Box<dyn ZKArg>>
-    where
-        Self: Sized,
-    {
-        let agent = agent.unwrap_or(self.agent());
-        agent.execute(input, self)
-    }
+    fn r1cs(&self, input_len: usize) -> Result<R1CS<E>>;
+
+    fn compute_wtns(&self, input: Vector<E>) -> Result<Vector<E>>;
 }
 
 /// An arithmetization agnostic argument of execution.
-pub trait ZKArg {
-    /// Opaque agent specific data necessary for verification.
-    fn cipher_bytes(&self) -> &[u8];
-    /// 32 byte program id that Self argues was executed.
-    fn program_id(&self) -> &[u8; 32];
-    /// Optional structure capable of creating and verifying Self.
-    fn agent(&self) -> &dyn ZKAgent;
-    /// Optional reference to program. For statically safe
-    /// programs over the wire.
-    fn program(&self) -> Option<&dyn ZKProgram>;
+pub trait ZKArg<E: FieldScalar>: Sized {
+    /// Create an argument of knowldge for a program and some inputs.
+    fn new(program: impl ZKProgram<E>, input: Vector<E>) -> Result<Self>;
 
-    /// Attempt to determine a program name, or return a placeholder.
-    fn program_name(&self) -> &str {
-        self.program()
-            .map(|p| p.name())
-            .flatten()
-            .unwrap_or("unnamed program")
+    /// Name the algebraic/oracle argument
+    fn name() -> &'static str {
+        "unnamed zk argument. i wouldn't trust it"
     }
+
+    /// Does the argument hold water ?
+    fn verify(self) -> Result<()>;
+
+    /// Retrieve the outputs of the program
+    fn outputs(&self) -> impl Iterator<Item = E>;
 }

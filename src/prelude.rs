@@ -1,4 +1,3 @@
-pub use crate::ZKAgent;
 pub use crate::ZKArg;
 pub use crate::ZKProgram;
 
