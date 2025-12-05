@@ -20,15 +20,15 @@ pub trait ZKProgram<E: FieldScalar> {
     ///
     fn id(&self) -> Vector<E>;
 
-    fn r1cs(&self, input_len: usize) -> Result<R1CS<E>>;
+    fn r1cs(&self, input_len: usize, static_args: &Vec<usize>) -> Result<R1CS<E>>;
 
-    fn compute_wtns(&self, input: Vector<E>) -> Result<Vector<E>>;
+    fn compute_wtns(&self, input: Vector<E>, static_args: &Vec<usize>) -> Result<Vector<E>>;
 }
 
 /// An arithmetization agnostic argument of execution.
 pub trait ZKArg<E: FieldScalar>: Sized {
     /// Create an argument of knowldge for a program and some inputs.
-    fn new(program: impl ZKProgram<E>, input: Vector<E>) -> Result<Self>;
+    fn new(program: impl ZKProgram<E>, input: Vector<E>, static_args: &Vec<usize>) -> Result<Self>;
 
     /// Name the algebraic/oracle argument
     fn name() -> &'static str {
@@ -36,7 +36,9 @@ pub trait ZKArg<E: FieldScalar>: Sized {
     }
 
     /// Does the argument hold water ?
-    fn verify(self) -> Result<()>;
+    ///
+    /// Returns public outputs.
+    fn verify(self) -> Result<impl Iterator<Item = E>>;
 
     /// Retrieve the outputs of the program
     fn outputs(&self) -> impl Iterator<Item = E>;
